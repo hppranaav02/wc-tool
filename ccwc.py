@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 
 # driver function
 def main():
@@ -9,37 +10,40 @@ def main():
     parser.add_argument('-c',action='store_true',help='This is a flag used to get the byte count of the file or standard output')
     parser.add_argument('-l',action='store_true',help='This is to get the number of lines in the file or standard input')
     parser.add_argument('-w',action='store_true',help='This is a flag to provide the number of words in the file or standard input')
-    parser.add_argument('filename', type=str,nargs=1)
+    parser.add_argument('filename', type=argparse.FileType('r'), nargs='?', default=sys.stdin)
     args = parser.parse_args()
     print('    ', end='')
     
+    file = args.filename.read()
+
     if args.c == True:
-        print(getBytes(args.filename[0]), end=' ')
+        print(getBytes(file), end=' ')
 
     if args.l == True:
-        print(getLines(args.filename[0]), end=' ')
+        print(getLines(file), end=' ')
 
     if args.w == True:
-        print(getWords(args.filename[0]), end=' ')
+        print(getWords(file), end=' ')
 
     if args.c == False and args.l == False and args.w == False:
-        print(getLines(args.filename[0]), end='   ')
-        print(getWords(args.filename[0]), end='  ')
-        print(getBytes(args.filename[0]), end=' ')
-    print(args.filename[0])
+        print(getLines(file), end='   ')
+        print(getWords(file), end='  ')
+        print(getBytes(file), end=' ')
+    if args.filename.name == '<stdin>':
+        print('')
+    else:
+        print(args.filename.name)
 
-def getLines(fileName):
-    f = open(fileName)
-    return len(f.readlines())
+def getLines(file):
+    return len(file.splitlines())
 
-def getBytes(fileName):
-    return os.stat(fileName).st_size
+def getBytes(file):
+    return len(file.encode('utf-8'))
 
-def getWords(fileName):
+def getWords(file):
     count = 0;
-    with open(fileName) as file:
-        for line in file.readlines():
-            count += len(line.rstrip().split())
+    for line in file.splitlines():
+        count += len(line.rstrip().split())
     return count
 
 main()
