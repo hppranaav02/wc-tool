@@ -1,8 +1,6 @@
 import argparse
-import os
 import sys
 
-# driver function
 def main():
 
     # Set the arguments
