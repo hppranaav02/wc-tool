@@ -3,7 +3,7 @@ This is an implementation of the `wc` command present in unix systems, in python
 \newline
 The `wc` command can be used in the following way:
 ```bash
-wc [OPTION]... [FILE]...
+python3 ccwc.py  [OPTION]... [FILE]...
 ```
 The options that can be used with the `wc` command are:
 - `-c` : This option is used to count the number of bytes in a file.
@@ -15,15 +15,22 @@ The `wc` command can be used with multiple files as well. In that case, the `wc`
 
 ## Learnings
 ### Handling command line arguments
-First was to parse command line arguments in python. You can make use of `sys.argv` parameter, which holds the list of command line arguments with sys.argv[0] being the script name, followed by others. Another, and more convinient method is to use the `argparse` module. 
+- First was to parse command line arguments in python. You can make use of `sys.argv` parameter, which holds the list of command line arguments with sys.argv[0] being the script name, followed by others. Another, and more convinient method is to use the `argparse` module. 
 
-This interfaces with sys.argv allowing us better control on what, which type and actions on the command line arguments the script accepts. It also provides Exception handling for misuse or incorrect command line arguments.
-In my case, I had to provide just a single input parameter, which is the filename, and a some flags which determine the output(what is done with the file). For this reason, i went with the below config
+- `argparse` gives us better control on what, which type and actions on the command line arguments the script accepts. It also provides Exception handling for misuse or incorrect command line arguments.
+In my case, I had to provide just a single input parameter, which is the filename or standard input, and a some flags which determine the output(what is done with the file). For this reason, i went with the below config
 
 ![image](images/argparse.png)
 
-The args are mentioned in the order they are expected and the type of input the accept. For the flags, i have set the action to set value to `True` is it is included. When the arguments are parsed, it is available as a list of tuples.
-The flag values can be accessed as `args.c` as value associated is implicitly a Boolean. We need to subscript the `args.filename` as it accepts string values which can be multiple.
+- The args are mentioned in the order they are expected and the type of input the accept. For the flags, I have set the action to set value to `True` is it is included. When the arguments are parsed, it is available as a list of tuples.
+The flag values can be accessed as `args.c` as value associated is implicitly a Boolean. 
+
+- For the file name argument, it gets a bit tricky as we also need to accept standard input through a pipe (`<stdin>`), hence we cannot just acccept a string type.
+For this, we accept arguments of type `argparse.FileType('r')`. This allows you to pass an argument of both a filename which will be loaded in buffer as a `_io.TextIOWrapper` object (simillar to opening a file with the `open()` method), and accept standard input pipes straight into the object buffer. we provide the default as `<stdin>`.
+We supply the number of args attribute as `nargs='?'`.
+
+### Custom Print
+The output to be shown required multiple print statements on the same line. Here I used the `end=` attribute in the print statement to describe a custom ending for every print. By default, it is `end='\n'`, which is why every print results in a newline.
 
 
 
